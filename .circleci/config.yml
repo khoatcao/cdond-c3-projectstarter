@@ -33,7 +33,7 @@ commands:
             fi
             
 jobs:
-  build-frontend:
+  build-frontend-test:
     docker:
       - image: circleci/node:13.8.0
     steps:
@@ -50,7 +50,7 @@ jobs:
           paths: [frontend/node_modules]
           key: frontend-build
 
-  build-backend:
+  build-backend-test:
     docker:
       - image: circleci/node:13.8.0
     steps:
@@ -268,8 +268,8 @@ cleanup:
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
+      - build-frontend-test
+      - build-backend-test
       - test-frontend:
           requires: [build-frontend]
       - test-backend:
