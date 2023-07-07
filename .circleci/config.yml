@@ -130,7 +130,6 @@ jobs:
     steps:
       # Checkout code from git
       - checkout 
-      - dependencies 
       - run:
           name: Ensure back-end infrastructure exists
           command: |
