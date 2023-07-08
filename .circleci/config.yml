@@ -6,7 +6,7 @@ commands:
   dependencies:
     steps:
       - run:
-          name: Installing necessary packages test
+          name: Installing necessary packages to test
           command: |
             sudo apt update
             sudo apt install -y tar gzip curl software-properties-common
