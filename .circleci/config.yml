@@ -2,7 +2,25 @@ version: 2.1
 
 # orbs:
 #   mailer-orb: sudiptog81/mailer-orb@1.0.0
-
+commands:
+  dependencies:
+    steps:
+      - run:
+          name: Installing necessary packages
+          command: |
+            sudo apt update
+            sudo apt install -y tar gzip curl software-properties-common
+      - run:
+          name: Installing aws-cli
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+      - run:
+          name: Installing ansible
+          command: |
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible
 
 jobs:
   notify:
@@ -31,6 +49,7 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
+      
       - restore_cache:
           keys: [frontend-build]
       - run:
