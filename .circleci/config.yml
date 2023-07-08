@@ -283,7 +283,7 @@ jobs:
             apk add openssh-client
             pip3 install awscli
       - run:
-          name: Configure server test
+          name: Configure server test v1
           command: |
             cat ~/project/.circleci/ansible/inventory.txt
             export ANSIBLE_HOST_KEY_CHECKING=False
