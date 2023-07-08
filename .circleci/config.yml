@@ -6,7 +6,7 @@ commands:
   dependencies:
     steps:
       - run:
-          name: Installing necessary packages to test continue
+          name: Installing  asfasfnecessary packages to test continue
           command: |
             sudo apt update
             sudo apt install -y tar gzip curl software-properties-common
