@@ -11,7 +11,7 @@ commands:
             sudo apt update
             sudo apt install -y tar gzip curl software-properties-common
       - run:
-          name: Installing aws-cli
+          name: Installing aws-cli test
           command: |
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
