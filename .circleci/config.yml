@@ -217,7 +217,7 @@ jobs:
       - dependencies
       # Checkout code from git
       - run:
-          name: Ensure back-end infrastructure exists
+          name: Ensure back-end infrastructure exists test
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
