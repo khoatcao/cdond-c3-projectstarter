@@ -4,9 +4,9 @@ version: 2.1
 #   mailer-orb: sudiptog81/mailer-orb@1.0.0
 commands:
   dependencies:
-    steps:
+    steps:  
       - run:
-          name: Installing asf asfga  asfasfnecessary packages to test continue asfafs asff test test
+          name: Installing asf asfga  asfasfnecessary packages to test continue asfafs asff
           command: |
             sudo apt update
             sudo apt install -y tar gzip curl software-properties-common
