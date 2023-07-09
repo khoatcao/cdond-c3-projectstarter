@@ -6,7 +6,7 @@ commands:
   dependencies:
     steps:  
       - run:
-          name: Installing asf asfga  asfasfnecessary packages to test continue asfafs asff
+          name: Installing asf asfga  asfasfnecessary packages to test continue asfafs asff test
           command: |
             sudo apt update
             sudo apt install -y tar gzip curl software-properties-common
