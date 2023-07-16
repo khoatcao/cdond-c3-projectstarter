@@ -1,0 +1,5 @@
+[web]
+ec2-3-83-147-134.compute-1.amazonaws.com
+
+[all]
+3.83.147.134
