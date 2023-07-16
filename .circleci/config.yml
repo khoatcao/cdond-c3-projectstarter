@@ -6,7 +6,7 @@ commands:
   dependencies:
     steps:  
       - run:
-          name: Install test   asfasfnecessary packages to test  test continue asfafs asff test test
+          name: Install test test  asfasfnecessary packages to test  test continue asfafs asff test test
           command: |
             sudo apt update
             sudo apt install -y tar gzip curl software-properties-common
@@ -209,8 +209,8 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      # - destroy-environment:
-      #     workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'  
+      - destroy-environment:
+          workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'  
 
 
   
