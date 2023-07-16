@@ -1,12 +1,12 @@
 version: 2.1
 
 # orbs:
-#   mailer-orb: sudiptog81/mailer-orb@1.0.0
+#   mailer-orb: sudiptog81/mailer-orb@1.0.
 commands:
   dependencies:
     steps:  
       - run:
-          name: Installing asf asfga  asfasfnecessary packages to test  test continue asfafs asff test test
+          name: Installing test asf asfga  asfasfnecessary packages to test  test continue asfafs asff test test
           command: |
             sudo apt update
             sudo apt install -y tar gzip curl software-properties-common
@@ -232,7 +232,7 @@ jobs:
       - checkout
       # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints: ["04:21:ed:89:b7:0c:af:ca:6c:7d:4e:64:48:58:06:3a"]
+          fingerprints: ["a2:bc:36:df:e2:ca:ed:35:10:e5:45:9c:49:9d:2e:6e"]
       - attach_workspace:
           at: ~/
       - run:
