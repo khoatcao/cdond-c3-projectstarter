@@ -282,8 +282,6 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
-
-
       - run:
           name: Install dependencies
           command: |
@@ -454,8 +452,8 @@ workflows:
 
       - run-migrations:
           requires: [deploy-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
+      - deploy-frontend:
+          requires: [run-migrations]
       - deploy-backend:
           requires: [run-migrations]
       - smoke-test:
