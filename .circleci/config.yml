@@ -211,90 +211,89 @@ jobs:
 
 
   
-  # configure-infrastructure:
-  #   docker:
-  #     - image: python:3.7-alpine3.11
-  #       environment:
-  #         NODE_ENV: "production"
-  #         VERSION: "1"
-  #         ENVIRONMENT: "production"
-  #         TYPEORM_CONNECTION: $TYPEORM_CONNECTION
-  #         TYPEORM_HOST: $TYPEORM_HOST
-  #         TYPEORM_USERNAME: $TYPEORM_USERNAME
-  #         TYPEORM_PASSWORD: $TYPEORM_PASSWORD
-  #         TYPEORM_DATABASE: $TYPEORM_DATABASE
-  #         TYPEORM_PORT: $TYPEORM_PORT
-  #         TYPEORM_ENTITIES: $TYPEORM_ENTITIES
-  #   steps:
-  #     - checkout
-  #     # Add ssh keys with fingerprint
-  #     - add_ssh_keys:
-  #         fingerprints: ["a2:bc:36:df:e2:ca:ed:35:10:e5:45:9c:49:9d:2e:6e"]
-  #     - attach_workspace:
-  #         at: ~/
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           apk add curl
-  #           apk add --upgrade bash
-  #           apk add --update ansible
-  #           apk add openssh-client
-  #           pip3 install awscli
-  #     - run:
-  #         name: Configure server
-  #         command: |
-  #           cat ~/project/.circleci/ansible/inventory.txt
-  #           export ANSIBLE_HOST_KEY_CHECKING=False
-  #           ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/configure-server.yml    
-  #     - destroy-environment:
-  #         workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'  
-
   configure-infrastructure:
     docker:
-      # Docker image here that supports test
       - image: python:3.7-alpine3.11
-#      - image: python:3.8-alpine3.15      
     steps:
-      # Checkout code from git
-      - checkout       
+      - checkout
       # Add ssh keys with fingerprint
       - add_ssh_keys:
           fingerprints: ["a2:bc:36:df:e2:ca:ed:35:10:e5:45:9c:49:9d:2e:6e"]
-      # attach workspace
       - attach_workspace:
           at: ~/
+      - run:
+        name: Install dependencies
+        command: |
+          apk add --update tar gzip ansible
+          pip install awscli
+      - run:
+        name: Configure server
+        command: |
+          cat ./.circleci/ansible/inventory.txt
+          export ANSIBLE_HOST_KEY_CHECKING=False
+          export RECORD_HOST_KEYS=False
+          export ANSIBLE_PARAMIKO_BANNER_TIMEOUT=30   
+          echo ENVIROMENT=production > "backend/.env"      
+          echo TYPEORM_CONNECTION=postgres >> "backend/.env"
+          echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
+          echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"          
+          echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"      
+          echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"            
+          echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"      
+          echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"     
+          echo "CONTENT OF backend/.env"      
+          cat backend/.env         
+          cd .circleci/ansible
+          ansible-playbook -i inventory.txt configure-server.yml -v
+      - destroy-environment:
+          workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'  
 
-      - run:
-          name: Install dependencies
-          command: |
-              apk add --update tar gzip ansible
-              pip install awscli
-#              pip install --upgrade pip
-#              pip install ansible
-#              pip install awscli
-#            apk update && apk add --no-cache musl-dev libffi-dev openssl-dev make gcc python py2-pip python-dev
-#            pip install --upgrade pip
-#            pip install cffi
-      - run:
-          name: Configure server
-          command: |
-            cat ./.circleci/ansible/inventory.txt
-            export ANSIBLE_HOST_KEY_CHECKING=False
-            export RECORD_HOST_KEYS=False
-            export ANSIBLE_PARAMIKO_BANNER_TIMEOUT=30   
-            echo ENVIROMENT=production > "backend/.env"      
-            echo TYPEORM_CONNECTION=postgres >> "backend/.env"
-            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
-            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"          
-            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"      
-            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"            
-            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"      
-            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"     
-            echo "CONTENT OF backend/.env"      
-            cat backend/.env         
-            cd .circleci/ansible
-            ansible-playbook -i inventory.txt configure-server.yml -v 
-      - destroy-environment
+#   configure-infrastructure:
+#     docker:
+#       # Docker image here that supports test
+#       - image: python:3.7-alpine3.11
+# #      - image: python:3.8-alpine3.15      
+#     steps:
+#       # Checkout code from git
+#       - checkout       
+#       # Add ssh keys with fingerprint
+#       - add_ssh_keys:
+#           fingerprints: ["a2:bc:36:df:e2:ca:ed:35:10:e5:45:9c:49:9d:2e:6e"]
+#       # attach workspace
+#       - attach_workspace:
+#           at: ~/
+
+#       - run:
+#           name: Install dependencies
+#           command: |
+#               apk add --update tar gzip ansible
+#               pip install awscli
+# #              pip install --upgrade pip
+# #              pip install ansible
+# #              pip install awscli
+# #            apk update && apk add --no-cache musl-dev libffi-dev openssl-dev make gcc python py2-pip python-dev
+# #            pip install --upgrade pip
+# #            pip install cffi
+#       - run:
+#           name: Configure server
+#           command: |
+#             cat ./.circleci/ansible/inventory.txt
+#             export ANSIBLE_HOST_KEY_CHECKING=False
+#             export RECORD_HOST_KEYS=False
+#             export ANSIBLE_PARAMIKO_BANNER_TIMEOUT=30   
+#             echo ENVIROMENT=production > "backend/.env"      
+#             echo TYPEORM_CONNECTION=postgres >> "backend/.env"
+#             echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
+#             echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"          
+#             echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"      
+#             echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"            
+#             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"      
+#             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"     
+#             echo "CONTENT OF backend/.env"      
+#             cat backend/.env         
+#             cd .circleci/ansible
+#             ansible-playbook -i inventory.txt configure-server.yml -v 
+#       - destroy-environment
 
 
 
