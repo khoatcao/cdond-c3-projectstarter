@@ -222,29 +222,19 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-        name: Install dependencies
-        command: |
-          apk add --update tar gzip ansible
-          pip install awscli
+          name: Install dependencies
+          command: |
+            apk add curl
+            apk add --upgrade bash
+            apk add --update ansible
+            apk add openssh-client
+            pip3 install awscli
       - run:
-        name: Configure server
-        command: |
-          cat ./.circleci/ansible/inventory.txt
-          export ANSIBLE_HOST_KEY_CHECKING=False
-          export RECORD_HOST_KEYS=False
-          export ANSIBLE_PARAMIKO_BANNER_TIMEOUT=30   
-          echo ENVIROMENT=production > "backend/.env"      
-          echo TYPEORM_CONNECTION=postgres >> "backend/.env"
-          echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
-          echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"          
-          echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"      
-          echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"            
-          echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"      
-          echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"     
-          echo "CONTENT OF backend/.env"      
-          cat backend/.env         
-          cd .circleci/ansible
-          ansible-playbook -i inventory.txt configure-server.yml -v
+          name: Configure server
+          command: |
+            cat ~/project/.circleci/ansible/inventory.txt
+            export ANSIBLE_HOST_KEY_CHECKING=False
+            ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/configure-server.yml    
       - destroy-environment:
           workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'  
 
