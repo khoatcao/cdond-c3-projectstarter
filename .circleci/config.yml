@@ -172,9 +172,6 @@ jobs:
             npm install 
             npm audit fix --audit-level=critical
 
-
-  
-  
   deploy-infrastructure:
     docker:
       - image: cimg/base:2021.04
@@ -254,7 +251,7 @@ jobs:
 
   configure-infrastructure:
     docker:
-      # Docker image here that supports Ansible
+      # Docker image here that supports test
       - image: python:3.7-alpine3.11
 #      - image: python:3.8-alpine3.15      
     steps:
@@ -262,7 +259,7 @@ jobs:
       - checkout       
       # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints: ["8d:3e:53:3f:96:70:3d:53:80:e4:eb:08:23:19:9e:8f"]
+          fingerprints: ["a2:bc:36:df:e2:ca:ed:35:10:e5:45:9c:49:9d:2e:6e"]
       # attach workspace
       - attach_workspace:
           at: ~/
