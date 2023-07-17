@@ -421,8 +421,8 @@ jobs:
             fi
 
    
-      - destroy-environment  
-      - revert-migrations
+      # - destroy-environment  
+      # - revert-migrations
       
 
 
