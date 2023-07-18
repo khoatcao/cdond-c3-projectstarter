@@ -8,7 +8,7 @@ commands:
   dependencies:
     steps:  
       - run:
-          name: Install test  asfasfnecessary packages to test  test continue asfafs asff test test
+          name: Install test test  asfasfnecessary packages to test  test continue asfafs asff test test
           command: |
             sudo apt update
             sudo apt install -y tar gzip curl software-properties-common
