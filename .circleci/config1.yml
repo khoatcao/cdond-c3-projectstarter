@@ -1,15 +1,142 @@
 version: 2.1
 
+# orbs:
+#   mailer-orb: sudiptog81/mailer-orb@1.0.
+
+
+commands:
+  dependencies:
+    steps:  
+      - run:
+          name: Install test  asfasfnecessary packages to test  test continue asfafs asff test test
+          command: |
+            sudo apt update
+            sudo apt install -y tar gzip curl software-properties-common
+      - run:
+          name: Installing aws-cli test
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+      - run:
+          name: Installing ansible
+          command: |
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible
+
+  # destroy-environment:
+  #   parameters:
+  #     workflow_id:
+  #       type: string
+  #   steps:
+  #     - run:
+  #         name: Destroying environment
+  #         when: on_fail
+  #         command: |
+  #           aws cloudformation delete-stack \
+  #             --stack-name "udapeople-frontend-<< parameters.workflow_id >>"
+  #           aws cloudformation delete-stack \
+  #             --stack-name "udapeople-backend-<< parameters.workflow_id >>"
+  #           aws s3 rm "s3://udapeople-<< parameters.workflow_id >>" --recursive
+
+  # revert-migrations:
+  #   parameters:
+  #     workflow_id:
+  #       type: string
+  #   steps:
+  #     - run:
+  #         name: Reverting migrations
+  #         when: on_fail
+  #         command: |
+  #           SUCCESS=$(curl "https://kvdb.io/LHFkzdfqGQiT5AocazCCLL//migration_<<parameters.workflow_id>>" -H "X-Api-Key: ${THISDB_API_KEY}")
+  #           if (($SUCCESS == 1)); then
+  #             cd backend
+  #             npm install
+  #             npm run migrations:revert
+  #           fi
+  destroy-environment:
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+    parameters:
+      Workflow_ID:
+        type: string
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            echo "Destroying environment: << parameters.Workflow_ID >> "
+            aws --region us-west-2 s3 rm s3://udapeople-<<parameters.Workflow_ID>> --recursive
+            aws --region us-west-2 cloudformation delete-stack --stack-name udapeople-backend-<< parameters.Workflow_ID >>
+            aws --region us-west-2 cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.Workflow_ID >>
+
+  install_awscli:
+    description: Install AWS CLI # https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+    steps:
+      - run:
+          name: Install tar and zip utilities
+          command: |
+            yum -y install tar gzip unzip zip python-dev
+      - run:
+          name: Install AWS CLI 
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            ./aws/install -i /usr/local/aws-cli -b /usr/local/bin
+
+  revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow.
+    parameters:
+      Workflow_ID:
+        type: string
+        default: ${CIRCLE_WORKFLOW_ID:0:7}    
+    steps:
+      - run:
+          name: Revert migrations
+          when: on_fail
+          command: |
+              SUCCESS=$(curl --insecure  https://kvdb.io/${KVDB_BUCKET_ID}/migration_<< parameters.Workflow_ID >>)
+              # Logic for reverting the database state
+              if (( $SUCCESS == 1 ));
+              then
+                cd ~/project/backend
+                npm install
+                npm run migration:revert
+              fi
+         
+
 jobs:
-  build-frontend-test:
+  notify:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - slack/notify:
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "*This is a text notification*",
+                      "emoji": true
+                    }
+                  ]
+                }
+              ]
+            }
+          event: always
+  build-frontend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
+
       - restore_cache:
           keys: [frontend-build]
       - run:
-          name: Build front-end
+          name: Build front-end test
           command: |
             cd frontend 
             npm install 
@@ -18,7 +145,7 @@ jobs:
           paths: [frontend/node_modules]
           key: frontend-build
 
-  build-backend-test:
+  build-backend:
     docker:
       - image: circleci/node:13.8.0
     steps:
@@ -26,7 +153,7 @@ jobs:
       - restore_cache:
           keys: [backend-build]
       - run:
-          name: Back-end build
+          name: Back-end build test
           command: |
             cd backend 
             npm install 
@@ -35,9 +162,79 @@ jobs:
           paths: [backend/node_modules]
           key: backend-build
 
+    
+  test-frontend:
+    docker:
+      - image: circleci/node:13.8.0
+
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [frontend-build]
+      - run:
+          name: Test front-end 
+          command: |
+            cd frontend
+            npm install 
+            npm run test 
+    
+                
+  test-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: Test Back-end
+          command: |
+            cd backend 
+            npm install 
+            npm run test 
+
+  scan-frontend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: scan frontend 
+          command: |
+            cd frontend 
+            npm install
+            npm audit fix --audit-level=critical
+
+
+  scan-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: scan frontend 
+          command: |
+            cd backend 
+            npm install 
+            npm audit fix --audit-level=critical
+
 
 workflows:
   default:
     jobs:
-      - build-frontend-test
-      - build-backend-test
+      - build-frontend
+      - build-backend
+      - test-frontend: 
+          requires: [build-frontend]
+
+      - test-backend: 
+          requires: [build-backend] 
+       - scan-frontend:
+          requires: [build-frontend] 
+      - scan-backend: 
+          requires: [build-backend]
+
